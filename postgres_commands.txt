@@ -1,0 +1,160 @@
+-- Create Country Table
+CREATE TABLE country (
+    IdCountry SERIAL PRIMARY KEY,
+    CountryName VARCHAR(100) NOT NULL
+);
+
+-- Create City Table
+CREATE TABLE city (
+    IdCity SERIAL PRIMARY KEY,
+    CityName VARCHAR(100) NOT NULL,
+    IdCountry INTEGER REFERENCES Country(IdCountry) ON DELETE CASCADE,
+    Lon FLOAT NOT NULL,
+    Lat FLOAT NOT NULL
+);
+
+-- Create TemperatureDay Table
+CREATE TABLE temperature_day (
+    IdCity INTEGER REFERENCES City(IdCity) ON DELETE CASCADE,
+    Date DATE NOT NULL,
+    TempMin FLOAT NOT NULL,
+    TempMax FLOAT NOT NULL,
+    TempAvg FLOAT NOT NULL,
+    AvgFeelsLike FLOAT NOT NULL,
+    PRIMARY KEY (IdCity, Date)
+);
+
+-- Create WindDay Table
+CREATE TABLE wind_day (
+    IdCity INTEGER REFERENCES City(IdCity) ON DELETE CASCADE,
+    Date DATE NOT NULL,
+    WindMin FLOAT NOT NULL,
+    WindMax FLOAT NOT NULL,
+    WindAvg FLOAT NOT NULL,
+    PRIMARY KEY (IdCity, Date)
+);
+
+-- Create HumidityDay Table
+CREATE TABLE humidity_day (
+    IdCity INTEGER REFERENCES City(IdCity) ON DELETE CASCADE,
+    Date DATE NOT NULL,
+    HumidityMin FLOAT NOT NULL,
+    HumidityMax FLOAT NOT NULL,
+    HumidityAvg FLOAT NOT NULL,
+    PRIMARY KEY (IdCity, Date)
+);
+
+-- Create RainDay Table
+CREATE TABLE rain_day (
+    IdCity INTEGER REFERENCES City(IdCity) ON DELETE CASCADE,
+    Date DATE NOT NULL,
+    RainMin FLOAT NOT NULL,
+    RainMax FLOAT NOT NULL,
+    RainAvg FLOAT NOT NULL,
+    PRIMARY KEY (IdCity, Date)
+);
+
+-- Create PressureDay Table (New)
+CREATE TABLE pressure_day (
+    IdCity INTEGER REFERENCES City(IdCity) ON DELETE CASCADE,
+    Date DATE NOT NULL,
+    PressureMin FLOAT NOT NULL,
+    PressureMax FLOAT NOT NULL,
+    PressureAvg FLOAT NOT NULL,
+    PRIMARY KEY (IdCity, Date)
+);
+
+-- Create WeatherConditionDay Table (New)
+CREATE TABLE weather_condition_day (
+    IdCity INTEGER REFERENCES City(IdCity) ON DELETE CASCADE,
+    Date DATE NOT NULL,
+    WeatherMain TEXT NOT NULL, -- E.g., "Rain", "Clouds", "Clear"
+    WeatherDescription TEXT NOT NULL, -- E.g., "light rain", "overcast clouds"
+    PRIMARY KEY (IdCity, Date)
+);
+
+-- Create ExtremeWeatherEvents Table (New)
+CREATE TABLE extreme_weather_events (
+    IdEvent SERIAL PRIMARY KEY,
+    IdCity INTEGER REFERENCES City(IdCity) ON DELETE CASCADE,
+    EventType TEXT NOT NULL, -- E.g., "Heatwave", "Storm", "Flood"
+    Severity TEXT NOT NULL, -- "Low", "Moderate", "Severe"
+    Description TEXT,
+    EventStart TIMESTAMP NOT NULL,
+    EventEnd TIMESTAMP NOT NULL
+);
+
+-- Create WeatherAlerts Table
+CREATE TABLE weather_alerts (
+    IdCity INTEGER REFERENCES City(IdCity) ON DELETE CASCADE,
+    Timestamp TIMESTAMP NOT NULL,
+    AlertType TEXT NOT NULL,
+    Details TEXT NOT NULL,
+    PRIMARY KEY (IdCity, Timestamp)
+);
+
+-- Create WeatherHour Table
+CREATE TABLE weather_hour (
+    IdCity INTEGER REFERENCES City(IdCity) ON DELETE CASCADE,
+    Date DATE NOT NULL,
+    Hour INT NOT NULL,
+    Temp FLOAT NOT NULL,
+    FeelsLike FLOAT NOT NULL,
+    Clouds FLOAT NOT NULL,
+    Rain FLOAT NOT NULL,
+    PRIMARY KEY (IdCity, Date, Hour)
+);
+
+-- Create AVGMonth Table
+CREATE TABLE AVG_month (
+    IdCity INTEGER REFERENCES City(IdCity) ON DELETE CASCADE,
+    Year INTEGER NOT NULL,
+    Month INTEGER NOT NULL,
+    AvgTemp FLOAT NOT NULL,
+    AvgHumidity FLOAT NOT NULL,
+    AvgRain FLOAT NOT NULL,
+    AvgWind FLOAT NOT NULL,
+    TempVariation FLOAT NOT NULL, -- Difference between min and max temp
+    PRIMARY KEY (IdCity, Year, Month)
+);
+
+-- Create AVGWeek Table
+CREATE TABLE AVG_week (
+    IdCity INTEGER REFERENCES City(IdCity) ON DELETE CASCADE,
+    Year INTEGER NOT NULL,
+    NumWeek INTEGER NOT NULL,
+    AvgTemp FLOAT NOT NULL,
+    AvgHumidity FLOAT NOT NULL,
+    AvgRain FLOAT NOT NULL,
+    AvgWind FLOAT NOT NULL,
+    TempVariation FLOAT NOT NULL, -- Difference between min and max temp
+    PRIMARY KEY (IdCity, Year, NumWeek)
+);
+
+-- Create Week Table
+CREATE TABLE week (
+    IdWeek SERIAL PRIMARY KEY,
+    NumWeek INTEGER NOT NULL UNIQUE,
+    DateIni DATE NOT NULL,
+    DateEnd DATE NOT NULL
+);
+
+-- Add Foreign Key for AVGWeek -> Week Relationship
+ALTER TABLE AVG_week
+ADD CONSTRAINT fk_avgweek_week FOREIGN KEY (NumWeek) REFERENCES week(NumWeek);
+
+-- Add unique constraint to CountryName
+ALTER TABLE country
+ADD CONSTRAINT unique_country_name UNIQUE (CountryName);
+
+-- Add unique constraint to CityName and IdCountry
+ALTER TABLE city
+ADD CONSTRAINT unique_city_country UNIQUE (CityName, IdCountry);
+
+-- Indexes for faster queries
+CREATE INDEX idx_temp_avg ON temperature_day (IdCity, TempAvg);
+CREATE INDEX idx_wind_avg ON wind_day (IdCity, WindAvg);
+CREATE INDEX idx_humidity_avg ON humidity_day (IdCity, HumidityAvg);
+CREATE INDEX idx_rain_avg ON rain_day (IdCity, RainAvg);
+CREATE INDEX idx_weather_hour ON weather_hour (IdCity, Date, Hour);
+CREATE INDEX idx_weather_alerts ON weather_alerts (IdCity, Timestamp);

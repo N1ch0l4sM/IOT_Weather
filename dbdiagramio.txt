@@ -1,0 +1,120 @@
+Table Country {
+  IdCountry integer [primary key]
+  CountryName varchar
+}
+
+Table City {
+  IdCity integer [primary key]
+  CityName varchar
+  IdCountry integer
+  Lon float
+  Lat float
+}
+
+Table TemperatureDay {
+  IdCity integer
+  Date date
+  TempMin float
+  TempMax float
+  TempAvg float
+  AvgFeelsLike float
+  indexes {
+    (IdCity, Date) [pk]
+  }
+}
+
+Table WindDay {
+  IdCity integer
+  Date date
+  WindMin float
+  WindMax float
+  WindAvg float
+  indexes {
+    (IdCity, Date) [pk]
+  }
+}
+
+Table HumidityDay {
+  IdCity integer
+  Date date
+  HumidityMin float
+  HumidityMax float
+  HumidityAvg float
+  indexes {
+    (IdCity, Date) [pk]
+  }
+}
+
+Table RainDay {
+  IdCity integer
+  Date date
+  RainMin float
+  RainMax float
+  RainAvg float
+  indexes {
+    (IdCity, Date) [pk]
+  }
+}
+
+Table WeatherAlerts {
+  IdCity integer
+  Timestamp datetime
+  AlertType TEXT
+  Details TEXT
+  indexes {
+    (IdCity, Timestamp) [pk]
+  }
+}
+
+Table WeatherHour {
+  IdCity integer
+  Date date
+  Hour int
+  Temp float
+  FeelsLike float
+  Clouds float
+  Rain float
+  indexes {
+    (IdCity, Date, Hour) [pk]
+  }
+}
+
+Table AVGMonth {
+  IdCity integer
+  Year integer
+  Month integer
+  AvgTemp float
+  AvgHumidity float
+  AvgRain float
+  AvgWind float
+  TempVariation float
+}
+
+Table AVGWeek {
+  IdCity integer
+  Year integer
+  NumWeek integer
+  AvgTemp float
+  AvgHumidity float
+  AvgRain float
+  AvgWind float
+  TempVariation float
+}
+
+Table Week {
+  IdWeek integer [primary key]
+  NumWeek integer
+  DateIni date
+  DateEnd date
+}
+
+Ref: Country.IdCountry < City.IdCountry
+Ref: City.IdCity < TemperatureDay.IdCity
+Ref: City.IdCity < WindDay.IdCity
+Ref: City.IdCity < HumidityDay.IdCity
+Ref: City.IdCity < RainDay.IdCity
+Ref: City.IdCity < WeatherAlerts.IdCity
+Ref: City.IdCity < WeatherHour.IdCity
+Ref: City.IdCity < AVGMonth.IdCity
+Ref: City.IdCity < AVGWeek.IdCity
+Ref: AVGWeek.NumWeek < Week.NumWeek

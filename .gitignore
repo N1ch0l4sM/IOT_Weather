@@ -1,0 +1,20 @@
+# Ignore Python compiled files
+__pycache__/
+*.pyc
+
+# Ignore environment variables and configuration files
+.env
+config.py
+
+# Ignore log files
+*.log
+
+# Ignore database files
+*.sqlite3
+
+# Ignore other files
+.DS_Store
+
+# Ignore crontab files
+crontab
+temp_crontab
