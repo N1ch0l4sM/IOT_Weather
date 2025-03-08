@@ -13,7 +13,7 @@ CREATE TABLE city (
     Lat FLOAT NOT NULL
 );
 
--- Create TemperatureDay Table
+-- Create TemperatureDay Table --ok
 CREATE TABLE temperature_day (
     IdCity INTEGER REFERENCES City(IdCity) ON DELETE CASCADE,
     Date DATE NOT NULL,
@@ -24,7 +24,7 @@ CREATE TABLE temperature_day (
     PRIMARY KEY (IdCity, Date)
 );
 
--- Create WindDay Table
+-- Create WindDay Table --ok
 CREATE TABLE wind_day (
     IdCity INTEGER REFERENCES City(IdCity) ON DELETE CASCADE,
     Date DATE NOT NULL,
@@ -34,7 +34,7 @@ CREATE TABLE wind_day (
     PRIMARY KEY (IdCity, Date)
 );
 
--- Create HumidityDay Table
+-- Create HumidityDay Table --ok
 CREATE TABLE humidity_day (
     IdCity INTEGER REFERENCES City(IdCity) ON DELETE CASCADE,
     Date DATE NOT NULL,
@@ -44,7 +44,7 @@ CREATE TABLE humidity_day (
     PRIMARY KEY (IdCity, Date)
 );
 
--- Create RainDay Table
+-- Create RainDay Table --ok
 CREATE TABLE rain_day (
     IdCity INTEGER REFERENCES City(IdCity) ON DELETE CASCADE,
     Date DATE NOT NULL,
@@ -54,7 +54,7 @@ CREATE TABLE rain_day (
     PRIMARY KEY (IdCity, Date)
 );
 
--- Create PressureDay Table (New)
+-- Create PressureDay Table --ok
 CREATE TABLE pressure_day (
     IdCity INTEGER REFERENCES City(IdCity) ON DELETE CASCADE,
     Date DATE NOT NULL,
@@ -64,7 +64,7 @@ CREATE TABLE pressure_day (
     PRIMARY KEY (IdCity, Date)
 );
 
--- Create WeatherConditionDay Table (New)
+-- Create WeatherConditionDay Table --ok
 CREATE TABLE weather_condition_day (
     IdCity INTEGER REFERENCES City(IdCity) ON DELETE CASCADE,
     Date DATE NOT NULL,
@@ -73,27 +73,7 @@ CREATE TABLE weather_condition_day (
     PRIMARY KEY (IdCity, Date)
 );
 
--- Create ExtremeWeatherEvents Table (New)
-CREATE TABLE extreme_weather_events (
-    IdEvent SERIAL PRIMARY KEY,
-    IdCity INTEGER REFERENCES City(IdCity) ON DELETE CASCADE,
-    EventType TEXT NOT NULL, -- E.g., "Heatwave", "Storm", "Flood"
-    Severity TEXT NOT NULL, -- "Low", "Moderate", "Severe"
-    Description TEXT,
-    EventStart TIMESTAMP NOT NULL,
-    EventEnd TIMESTAMP NOT NULL
-);
-
--- Create WeatherAlerts Table
-CREATE TABLE weather_alerts (
-    IdCity INTEGER REFERENCES City(IdCity) ON DELETE CASCADE,
-    Timestamp TIMESTAMP NOT NULL,
-    AlertType TEXT NOT NULL,
-    Details TEXT NOT NULL,
-    PRIMARY KEY (IdCity, Timestamp)
-);
-
--- Create WeatherHour Table
+-- Create WeatherHour Table --ok
 CREATE TABLE weather_hour (
     IdCity INTEGER REFERENCES City(IdCity) ON DELETE CASCADE,
     Date DATE NOT NULL,
@@ -103,7 +83,8 @@ CREATE TABLE weather_hour (
     Clouds FLOAT,
     Rain FLOAT,
     Wind FLOAT,
-    Pressure FLOAT
+    Pressure FLOAT,
+    Humidity FLOAT
     PRIMARY KEY (IdCity, Date, Hour)
 );
 
@@ -120,30 +101,6 @@ CREATE TABLE AVG_month (
     PRIMARY KEY (IdCity, Year, Month)
 );
 
--- Create AVGWeek Table
-CREATE TABLE AVG_week (
-    IdCity INTEGER REFERENCES City(IdCity) ON DELETE CASCADE,
-    Year INTEGER NOT NULL,
-    NumWeek INTEGER NOT NULL,
-    AvgTemp FLOAT NOT NULL,
-    AvgHumidity FLOAT NOT NULL,
-    AvgRain FLOAT NOT NULL,
-    AvgWind FLOAT NOT NULL,
-    TempVariation FLOAT NOT NULL, -- Difference between min and max temp
-    PRIMARY KEY (IdCity, Year, NumWeek)
-);
-
--- Create Week Table
-CREATE TABLE week (
-    IdWeek SERIAL PRIMARY KEY,
-    NumWeek INTEGER NOT NULL UNIQUE,
-    DateIni DATE NOT NULL,
-    DateEnd DATE NOT NULL
-);
-
--- Add Foreign Key for AVGWeek -> Week Relationship
-ALTER TABLE AVG_week
-ADD CONSTRAINT fk_avgweek_week FOREIGN KEY (NumWeek) REFERENCES week(NumWeek);
 
 -- Add unique constraint to CountryName
 ALTER TABLE country
