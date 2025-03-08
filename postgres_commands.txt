@@ -1,10 +1,10 @@
--- Create Country Table
+-- Create Country Table --ok
 CREATE TABLE country (
     IdCountry SERIAL PRIMARY KEY,
     CountryName VARCHAR(100) NOT NULL
 );
 
--- Create City Table
+-- Create City Table --ok
 CREATE TABLE city (
     IdCity SERIAL PRIMARY KEY,
     CityName VARCHAR(100) NOT NULL,
@@ -98,10 +98,12 @@ CREATE TABLE weather_hour (
     IdCity INTEGER REFERENCES City(IdCity) ON DELETE CASCADE,
     Date DATE NOT NULL,
     Hour INT NOT NULL,
-    Temp FLOAT NOT NULL,
-    FeelsLike FLOAT NOT NULL,
-    Clouds FLOAT NOT NULL,
-    Rain FLOAT NOT NULL,
+    Temp FLOAT,
+    FeelsLike FLOAT,
+    Clouds FLOAT,
+    Rain FLOAT,
+    Wind FLOAT,
+    Pressure FLOAT
     PRIMARY KEY (IdCity, Date, Hour)
 );
 

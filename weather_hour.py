@@ -52,6 +52,7 @@ SELECT
     ROUND(AVG(COALESCE(rain.`1h`, 0)), 2) AS avg_rain,
     ROUND(AVG(wind.speed), 2) AS avg_wind,
     ROUND(AVG(clouds.all), 2) AS avg_clouds,
+    ROUND(AVG(main.pressure), 2) AS avg_pressure,
     ROUND(AVG(main.feels_like), 2) AS avg_feels_like
 FROM filtered_weather
 GROUP BY ROUND(coord.lon, 2), ROUND(coord.lat, 2)
@@ -79,6 +80,7 @@ SELECT
     w.avg_wind,
     w.avg_clouds,
     w.avg_feels_like,
+    w.avg_pressure,
     w.lon,
     w.lat
 FROM avg_weather w
@@ -103,7 +105,10 @@ SELECT
     avg_temperature AS Temp,
     avg_feels_like AS FeelsLike,
     avg_clouds AS Clouds,
-    avg_rain AS Rain
+    avg_rain AS Rain,
+    avg_wind AS Wind,
+    avg_pressure AS Pressure,
+    avg_humidity AS Humidity
 FROM result_join
 """
 final_df = spark.sql(final_sql)
