@@ -1,14 +1,14 @@
 from pymongo import MongoClient
 from datetime import datetime, timedelta
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, round
+from pyspark.sql.functions import col, round, lit
 import config
-import psycopg2
+
 
 # Initialize Spark session
 spark = SparkSession.builder \
     .appName("MongoDB to PostGres") \
-    .config("spark.mongodb.input.uri", f"mongodb://{config.user}:{config.password}@{config.mongo_host}:{config.mongo_port}/{config.mongo_db}.iot_weather") \
+    .config("spark.mongodb.input.uri", f"mongodb://{config.user}:{config.password}@{config.mongo_host}:{config.mongo_port}/{config.mongo_db}.iot_weather?authSource=admin") \
     .config("spark.jars.packages", "org.mongodb.spark:mongo-spark-connector_2.12:3.0.1,org.postgresql:postgresql:42.6.0") \
     .getOrCreate()
 
@@ -26,7 +26,7 @@ postgres_properties = {
 }
 
 # Connect to MongoDB
-client = MongoClient(mongo_host, mongo_port, username=config.user, password=config.password)
+client = MongoClient(mongo_host, mongo_port, username=config.user, password=config.password, authSource="admin")
 db = client[mongo_db]
 collection = db[mongo_collection]
 
@@ -51,7 +51,9 @@ SELECT
     ROUND(AVG(main.temp), 2) AS avg_temperature,
     ROUND(AVG(main.humidity), 2) AS avg_humidity,
     ROUND(AVG(COALESCE(rain.`1h`, 0)), 2) AS avg_rain,
-    ROUND(AVG(wind.speed), 2) AS avg_wind
+    ROUND(AVG(wind.speed), 2) AS avg_wind,
+    ROUND(AVG(clouds.all), 2) AS avg_clouds,
+    ROUND(AVG(main.feels_like), 2) AS avg_feels_like
 FROM weather_raw
 GROUP BY ROUND(coord.lon, 2), ROUND(coord.lat, 2)
 """
@@ -77,6 +79,8 @@ SELECT
     w.avg_humidity,
     w.avg_rain,
     w.avg_wind,
+    w.avg_clouds,
+    w.avg_feels_like,
     w.lon,
     w.lat
 FROM avg_weather w
@@ -87,51 +91,37 @@ JOIN cities c
 
 result_df = spark.sql(joined_sql)
 
-# Show the joined results
-result_df.show()
-
-# Get current date and hour
-current_date = (datetime.now() - timedelta(hours=1)).strftime("%Y-%m-%d")
-one_hour_ago_num = datetime.now().hour
-
-# Convert DataFrame to a list of tuples for batch insertion
-rows_to_insert = [(
-    row.city_id, 
-    row.avg_temperature, 
-    row.avg_humidity, 
-    row.avg_rain, 
-    row.avg_wind, 
-    current_date, 
-    one_hour_ago_num
-) for row in result_df.collect()]
-
-# Connect to PostgreSQL for insertion
-postgre_conn = psycopg2.connect(
-    dbname=config.postG_db,
-    user=config.user,
-    password=config.password,
-    host=config.postG_host,
-    port=config.postG_port
-)
-cursor = postgre_conn.cursor()
-
-# Insert data into PostgreSQL
-if rows_to_insert:
-    cursor.executemany("""
-    INSERT INTO avg_hour ("idCity", "AvgTemp", "AvgHumidity", "AvgRain", "AvgWind", "Date", "Hour")
-    VALUES (%s, %s, %s, %s, %s, %s, %s)
-    """, rows_to_insert)
-    postgre_conn.commit()
-    print(f"Successfully inserted {len(rows_to_insert)} records into avg_hour table")
-else:
-    print("No new data to insert.")
-
-# Close the PostgreSQL connection
-cursor.close()
-postgre_conn.close()
-
-# Close the MongoDB connection
-client.close()
-
-# Stop the Spark session
-spark.stop()
+try:
+    # Show the joined results
+    result_df.show()
+    
+    # Compute one-hour–ago time for consistency
+    one_hour_ago = datetime.now() - timedelta(hours=1)
+    current_date = one_hour_ago.strftime("%Y-%m-%d")
+    one_hour_ago_num = one_hour_ago.hour
+    
+    # Cast current_date to date type
+    result_df = result_df.withColumn("Date", lit(current_date).cast("date")) \
+                         .withColumn("Hour", lit(one_hour_ago_num))
+    
+    jdbc_url = f"jdbc:postgresql://{config.postG_host}:{config.postG_port}/{config.postG_db}"
+    
+    # Modified insert mapping for weather_hour table
+    result_df.select(
+        col("city_id").alias("idCity"),
+        col("Date"),
+        col("Hour"),
+        col("avg_temperature").alias("Temp"),
+        col("avg_feels_like").alias("FeelsLike"),  
+        col("avg_clouds").alias("Clouds"),           
+        col("avg_rain").alias("Rain")
+    ).write.mode("append").jdbc(url=jdbc_url, table="weather_hour", properties=postgres_properties)
+    
+    print("Successfully appended records to weather_hour table using PySpark")
+except Exception as e:
+    print("Error occurred:", e)
+finally:
+    # Close the MongoDB connection
+    client.close()
+    # Stop the Spark session
+    spark.stop()
