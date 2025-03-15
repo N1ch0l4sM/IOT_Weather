@@ -8,6 +8,7 @@ yesterday = date.today() - timedelta(days=1)
 # ...existing code to create Spark session...
 spark = SparkSession.builder \
     .appName("Aggregate Rain Hour Data") \
+    .config("spark.jars.packages", "org.postgresql:postgresql:42.2.23") \
     .getOrCreate()
 
 # JDBC connection parameters using config
