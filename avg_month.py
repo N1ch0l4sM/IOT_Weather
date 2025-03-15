@@ -1,3 +1,4 @@
+from datetime import date, timedelta
 from pyspark.sql import SparkSession
 import config
 
@@ -26,6 +27,10 @@ try:
     rain_df.createOrReplaceTempView("rain_day")
     wind_df.createOrReplaceTempView("wind_day")
 
+  # Compute yesterday's date
+    month = (date.today() - timedelta(days=1)).month
+    year = (date.today() - timedelta(days=1)).year
+
     # Use SparkSQL with CTEs to aggregate monthly data per city
     agg_query = """
         WITH temp_agg AS (
@@ -37,6 +42,7 @@ try:
                 MIN(TempMin) AS MinTemp,
                 MAX(TempMax) AS MaxTemp
             FROM temperature_day
+            WHERE EXTRACT(MONTH FROM Date) = {month} and EXTRACT(YEAR FROM Date) = {year}
             GROUP BY IdCity, EXTRACT(YEAR FROM Date), EXTRACT(MONTH FROM Date)
         ),
         hum_agg AS (
@@ -46,6 +52,7 @@ try:
                 EXTRACT(MONTH FROM Date) AS Month,
                 AVG(HumidityAvg) AS AvgHumidity
             FROM humidity_day
+            WHERE EXTRACT(MONTH FROM Date) = {month} and EXTRACT(YEAR FROM Date) = {year}
             GROUP BY IdCity, EXTRACT(YEAR FROM Date), EXTRACT(MONTH FROM Date)
         ),
         rain_agg AS (
@@ -55,6 +62,7 @@ try:
                 EXTRACT(MONTH FROM Date) AS Month,
                 AVG(RainAvg) AS AvgRain
             FROM rain_day
+            WHERE EXTRACT(MONTH FROM Date) = {month} and EXTRACT(YEAR FROM Date) = {year}
             GROUP BY IdCity, EXTRACT(YEAR FROM Date), EXTRACT(MONTH FROM Date)
         ),
         wind_agg AS (
@@ -64,6 +72,7 @@ try:
                 EXTRACT(MONTH FROM Date) AS Month,
                 AVG(WindAvg) AS AvgWind
             FROM wind_day
+            WHERE EXTRACT(MONTH FROM Date) = {month} and EXTRACT(YEAR FROM Date) = {year}
             GROUP BY IdCity, EXTRACT(YEAR FROM Date), EXTRACT(MONTH FROM Date)
         )
         SELECT 
