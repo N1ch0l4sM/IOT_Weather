@@ -27,9 +27,9 @@ result_df = spark.sql(f"""
     SELECT 
         IdCity,
         Date,
-        MIN(Rain) AS RainMin,
-        MAX(Rain) AS RainMax,
-        AVG(Rain) AS RainAvg
+        ROUND(MIN(Rain), 2) AS RainMin,
+        ROUND(MAX(Rain), 2) AS RainMax,
+        ROUND(AVG(Rain), 2) AS RainAvg
     FROM weather_hour
     WHERE Date = '{yesterday}'
     GROUP BY IdCity, Date

@@ -29,10 +29,10 @@ result_df = spark.sql(f"""
     SELECT 
         IdCity,
         Date,
-        MIN(Temp) AS TempMin,
-        MAX(Temp) AS TempMax,
-        AVG(Temp) AS TempAvg,
-        AVG(FeelsLike) AS AvgFeelsLike
+        ROUND(MIN(Temp), 2) AS TempMin,
+        ROUND(MAX(Temp), 2) AS TempMax,
+        ROUND(AVG(Temp), 2) AS TempAvg,
+        ROUND(AVG(FeelsLike), 2) AS AvgFeelsLike
     FROM weather_hour
     WHERE Date = '{yesterday}'
     GROUP BY IdCity, Date

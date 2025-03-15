@@ -27,9 +27,9 @@ result_df = spark.sql(f"""
     SELECT 
         IdCity,
         Date,
-        MIN(Pressure) AS PressureMin,
-        MAX(Pressure) AS PressureMax,
-        AVG(Pressure) AS PressureAvg
+        ROUND(MIN(Pressure), 2) AS PressureMin,
+        ROUND(MAX(Pressure), 2) AS PressureMax,
+        ROUND(AVG(Pressure), 2) AS PressureAvg
     FROM weather_hour
     WHERE Date = '{yesterday}'
     GROUP BY IdCity, Date

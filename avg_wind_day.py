@@ -29,9 +29,9 @@ result_df = spark.sql(f"""
     SELECT 
         IdCity,
         Date,
-        MIN(Wind) AS WindMin,
-        MAX(Wind) AS WindMax,
-        AVG(Wind) AS WindAvg
+        ROUND(MIN(Wind), 2) AS WindMin,
+        ROUND(MAX(Wind), 2) AS WindMax,
+        ROUND(AVG(Wind), 2) AS WindAvg
     FROM weather_hour
     WHERE Date = '{yesterday}'
     GROUP BY IdCity, Date

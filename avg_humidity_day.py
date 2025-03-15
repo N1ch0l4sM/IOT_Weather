@@ -27,9 +27,9 @@ result_df = spark.sql(f"""
     SELECT 
         IdCity,
         Date,
-        MIN(Humidity) AS HumidityMin,
-        MAX(Humidity) AS HumidityMax,
-        AVG(Humidity) AS HumidityAvg
+        ROUND(MIN(Humidity), 2) AS HumidityMin,
+        ROUND(MAX(Humidity), 2) AS HumidityMax,
+        ROUND(AVG(Humidity), 2) AS HumidityAvg
     FROM weather_hour
     WHERE Date = '{yesterday}'
     GROUP BY IdCity, Date
