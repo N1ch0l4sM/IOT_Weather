@@ -3,10 +3,14 @@
 # Initialize Conda environment
 eval "$(conda shell.bash hook)"
 conda activate iot_weather
+export AIRFLOW__CORE__LOAD_EXAMPLES=False  # Disable loading of example DAGs
+
+# Initialize Airflow database
+airflow db init
 
 # Copy DAG files to the Airflow DAGs directory
 mkdir -p ~/airflow/dags
-cp -f /home/nicholas/Documents/IOT_Weather/dags/*.py ~/airflow/dags/
+cp -f /home/nicholas/Documents/IOT_Weather/airflow/dags/*.py ~/airflow/dags/
 
 # Function to check if a process is running and start it if not
 start_if_not_running() {
