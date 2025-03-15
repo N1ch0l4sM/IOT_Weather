@@ -1,6 +1,8 @@
 from pyspark.sql import SparkSession
 from datetime import date, timedelta
-import config
+import sys
+sys.path.append('/home/nicholas/Documents/IOT_Weather')
+import config as config
 
 # Compute yesterday's date
 yesterday = date.today() - timedelta(days=1)

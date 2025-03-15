@@ -1,5 +1,7 @@
 from pyspark.sql import SparkSession
-import config  # added to use config parameters
+import sys
+sys.path.append('/home/nicholas/Documents/IOT_Weather')
+import config as config
 from datetime import date, timedelta  # added to compute yesterday's date
 
 # Compute yesterday's date

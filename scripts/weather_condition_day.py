@@ -1,7 +1,9 @@
 from datetime import datetime, timedelta
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import lit
-import config
+import sys
+sys.path.append('/home/nicholas/Documents/IOT_Weather')
+import config as config
 
 try:
     # Initialize Spark session

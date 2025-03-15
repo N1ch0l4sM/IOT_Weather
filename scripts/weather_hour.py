@@ -1,7 +1,10 @@
+import sys
+sys.path.append('/home/nicholas/Documents/IOT_Weather')
+import config as config
+
 from pymongo import MongoClient
 from datetime import datetime, timedelta
 from pyspark.sql import SparkSession
-import config
 
 # Initialize Spark session
 spark = SparkSession.builder \

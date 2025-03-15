@@ -32,5 +32,5 @@ with DAG(
     # Replacing the PythonOperator with BashOperator to run the weather fetch script
     fetch_task = BashOperator(
         task_id='fetch_weather_data',
-        bash_command=f'{conda_init} && python {project_dir}/scripts/fetch_weather.py >> {project_dir}/airflow_logs/airflow_weather_fetch.log 2>&1',
+        bash_command=f'{conda_init} && python {project_dir}/scripts/weather_fetch.py >> {project_dir}/airflow_logs/airflow_weather_fetch.log 2>&1',
     )

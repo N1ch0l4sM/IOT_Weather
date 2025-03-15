@@ -1,7 +1,9 @@
 import requests
 import json
 from datetime import datetime
-import config
+import sys
+sys.path.append('/home/nicholas/Documents/IOT_Weather')
+import config as config
 from pymongo import MongoClient
 
 # Log the Python executable path and environment variables

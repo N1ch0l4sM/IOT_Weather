@@ -1,7 +1,9 @@
 import argparse
 from datetime import datetime
 from pyspark.sql import SparkSession
-import config
+import sys
+sys.path.append('/home/nicholas/Documents/IOT_Weather')
+import config as config
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Aggregate weather data over a custom date range")

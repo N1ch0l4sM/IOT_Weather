@@ -1,4 +1,6 @@
-import config
+import sys
+sys.path.append('/home/nicholas/Documents/IOT_Weather')
+import config as config
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import from_unixtime, to_date, hour
 
