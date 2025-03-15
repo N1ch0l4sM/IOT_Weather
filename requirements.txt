@@ -6,3 +6,8 @@ pyspark==3.1.2
 psycopg2==2.9.9
 pymongo==4.8.0
 #openjdk == 1.8.0_442 (sudo apt install openjdk-8-jdk -y)
+apache-airflow==2.10.4
+# airflow providers list
+apache-airflow-providers-postgres==5.8.0
+apache-airflow-providers-mongo==3.4.0
+apache-airflow-providers-apache-spark==4.5.0
