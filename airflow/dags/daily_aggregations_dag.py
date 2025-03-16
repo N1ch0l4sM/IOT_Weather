@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.operators.bash import BashOperator
-from airflow.sensors.external_task import ExternalTaskSensor
 
 default_args = {
     'owner': 'airflow',
@@ -18,21 +17,11 @@ with DAG(
     default_args=default_args,
     description='Process daily weather aggregations',
     schedule_interval='30 0 * * *',  # Every day at 0:30 AM
-    start_date=datetime(2025, 1, 1),
+    start_date=datetime(2025, 3, 17),
     catchup=False,
 ) as dag:
     
-    # Sensor to wait for weather_fetch dag to finish successfully
-    wait_for_weather_fetch = ExternalTaskSensor(
-        task_id='wait_for_weather_fetch',
-        external_dag_id='weather_fetch',
-        external_task_id=None,  # waits for the entire DAG
-        allowed_states=['success'],
-        poke_interval=60,
-        timeout=600,
-        mode='reschedule'
-    )
-    
+   
     project_dir = '/home/nicholas/Documents/IOT_Weather'
     conda_init = 'eval "$(conda shell.bash hook)" && conda activate iot_weather'
     
@@ -71,6 +60,3 @@ with DAG(
         task_id='weather_condition_day',
         bash_command=f'{conda_init} && python {project_dir}/scripts/weather_condition_day.py > {project_dir}/airflow_logs/airflow_weather_condition.log 2>&1',
     )
-
-    # Set dependencies: all tasks start after the weather_fetch DAG finishes
-    wait_for_weather_fetch >> [temp_task, humidity_task, wind_task, rain_task, pressure_task, weather_condition_task]

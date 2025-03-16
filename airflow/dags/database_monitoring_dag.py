@@ -40,6 +40,8 @@ with DAG(
             )
             cursor = conn.cursor()
             
+            cursor.execute("SELECT Analyze;")
+            
             # Check database size
             cursor.execute("SELECT pg_size_pretty(pg_database_size(current_database()))")
             db_size = cursor.fetchone()[0]
