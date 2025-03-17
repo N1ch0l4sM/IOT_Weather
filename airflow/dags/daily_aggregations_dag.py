@@ -2,9 +2,6 @@ from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.operators.bash import BashOperator
 
-from datetime import datetime, timedelta 
-import pendulum
-
 default_args = {
     'owner': 'airflow',
     'depends_on_past': False,
@@ -14,17 +11,14 @@ default_args = {
     'retry_delay': timedelta(minutes=5),
 }
 
-local_tz = pendulum.timezone("America/Sao_Paulo")
-
 # DAG for daily aggregations (runs once a day)
 with DAG(
     'daily_aggregations',
     default_args=default_args,
     description='Process daily weather aggregations',
     schedule_interval='30 0 * * *',  # Every day at 0:30 AM
-    start_date=datetime(2025, 3, 17, tzinfo=local_tz),
+    start_date=datetime(2025, 3, 17),
     catchup=False,
-    timezone=local_tz,
 ) as dag:
    
     project_dir = '/home/nicholas/Documents/IOT_Weather'
