@@ -39,7 +39,7 @@ with DAG(
             )
             cursor = conn.cursor()
             
-            cursor.execute("SELECT Analyze;")
+            cursor.execute("ANALYZE;")
             
             # Check database size
             cursor.execute("SELECT pg_size_pretty(pg_database_size(current_database()))")
